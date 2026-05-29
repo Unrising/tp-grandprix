@@ -1,4 +1,5 @@
 import express from "express";
+import { grandstandsRouter } from "./routes/grandstand.routes";
 
 export const app = express();
 
@@ -9,3 +10,5 @@ app.get("/health", (req, res) => {
     status: "ok"
   });
 });
+
+app.use("/grandstands", grandstandsRouter);

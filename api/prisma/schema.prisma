@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum GrandstandCategory {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum SessionDay {
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum SessionType {
+  PRACTICE
+  QUALIFYING
+  SPRINT
+  RACE
+}
+
+enum FidelityProgram {
+  NONE
+  SILVER
+  GOLD
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model Grandstand {
+  id            Int                 @id @default(autoincrement())
+  name          String
+  location      String
+  category      GrandstandCategory
+  capacity      Int
+  baseSeatPrice Decimal             @db.Decimal(10, 2)
+  covered       Boolean
+
+  reservations  Reservation[]
+
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model Session {
+  id              Int                  @id @default(autoincrement())
+  day             SessionDay
+  date            DateTime
+  type            SessionType
+  priceMultiplier Decimal              @db.Decimal(5, 2)
+
+  reservations    ReservationSession[]
+
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+}
+
+model Spectator {
+  id               Int             @id @default(autoincrement())
+  name             String
+  email            String          @unique
+  birthDate        DateTime
+  fidelityProgram  FidelityProgram @default(NONE)
+  registrationDate DateTime        @default(now())
+
+  reservations     Reservation[]
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model Reservation {
+  id              Int                 @id @default(autoincrement())
+
+  spectatorId     Int
+  spectator       Spectator           @relation(fields: [spectatorId], references: [id])
+
+  grandstandId    Int
+  grandstand      Grandstand          @relation(fields: [grandstandId], references: [id])
+
+  sessions        ReservationSession[]
+
+  seatCount       Int
+  totalPrice      Decimal             @db.Decimal(10, 2)
+
+  status          ReservationStatus    @default(CONFIRMED)
+
+  reservedAt      DateTime             @default(now())
+  cancelledAt     DateTime?
+  refundedAmount  Decimal?             @db.Decimal(10, 2)
+
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+}
+
+model ReservationSession {
+  reservationId Int
+  sessionId     Int
+
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  session       Session     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@id([reservationId, sessionId])
+}
