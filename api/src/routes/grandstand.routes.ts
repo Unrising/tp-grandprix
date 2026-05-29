@@ -12,7 +12,7 @@ type GrandstandCategory = typeof allowedCategories[number];
  * Créer une tribune
  */
 grandstandsRouter.post("/", async (req: Request, res: Response) => {
-  const {
+  let {
     name,
     location,
     category,
