@@ -1,1 +1,2 @@
 npx --no -- commitlint --edit \$1
+sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.token=sqp_fa1f87f0de482a7df2a58857b4e7e7d95ed8e6cc -Dsonar.projectKey=API-Express
